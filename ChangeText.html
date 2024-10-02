@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<script>
+    function getRandomNumber() {
+        // Generate a random number between 1 and 100
+        let randomNumber = Math.floor(Math.random() * 100) + 1;
+
+        // Insert the random number into the DOM element
+        document.getElementById("randomNumberDisplay").innerHTML = "Random Number: " + randomNumber;
+    }
+</script>
+
+<body>
+
+    <div id="demo">
+        <h2>The XMLHttpRequest Object</h2>
+        <button type="button" onclick="loadDoc()">Change Content</button>
+        <button type="button" onclick="loadDoc2()">Change Content</button>
+        <button type="button" onclick="loadDoc3()">Artist list</button>
+    </div>
+    <h1>AJAX Random Number Example</h1>
+    <button onclick="getRandomNumber()">Get Random Number</button>
+    <div id="randomNumberDisplay"></div>
+
+    <script>
+        function loadDoc() {
+            const xhttp = new XMLHttpRequest();
+            xhttp.onload = function() {
+                document.getElementById("demo").innerHTML += this.responseText;
+            }
+            xhttp.open("GET", "ajax_info.txt", true);
+            xhttp.send();
+        }
+
+        function loadDoc2() {
+            var xhttp = new XMLHttpRequest();
+            xhttp.open("GET", "ajax_info.txt", false);
+            xhttp.send();
+            document.getElementById("demo").innerHTML += xhttp.responseText;
+        }
+
+        function loadDoc3() {
+            const xhttp = new XMLHttpRequest();
+
+            xhttp.onload = function() {
+                console.log("Raw responseText:", this.responseText); // Log raw content
+
+                // Check if responseXML is valid
+                let xmlDoc;
+                if (this.responseXML === null) {
+                    // Parse manually if responseXML is null
+                    const parser = new DOMParser();
+                    xmlDoc = parser.parseFromString(this.responseText, "application/xml");
+                } else {
+                    xmlDoc = this.responseXML;
+                }
+
+                // Check if xmlDoc is properly parsed
+                if (xmlDoc) {
+                    const x = xmlDoc.getElementsByTagName("ARTIST");
+                    let txt = "";
+
+                    for (let i = 0; i < x.length; i++) {
+                        if (x[i].childNodes[0].nodeValue) {
+                            txt += x[i].childNodes[0].nodeValue + "<br>";
+                        }
+                    }
+
+                    document.getElementById("demo").innerHTML = txt; // Update the demo div with the XML data
+                } else {
+                    console.error("Failed to load or parse XML.");
+                    document.getElementById("demo").innerHTML = "Error loading XML file.";
+                }
+            };
+
+            xhttp.onerror = function() {
+                console.error("Network error occurred.");
+                document.getElementById("demo").innerHTML = "Error: Network issue or file not found.";
+            };
+
+            // Open the request and send
+            xhttp.open("GET", "./demo_get.xml", true);
+            xhttp.send();
+        }
+    </script>
+
+</body>
+
+</html>
